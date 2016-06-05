@@ -28,7 +28,7 @@ case class UserRemoved(id: String, version: Long) extends UserEvent
 
 // Starting from the persistent actor template in "Reactive Messaging Patterns" p. 355
 class UserProcessor extends PersistentActor {
-  override def persistenceId = "user-market"
+  override def persistenceId = "user-processor"
   var users = Map[String, User]()
 
   override def receiveCommand: Receive = {

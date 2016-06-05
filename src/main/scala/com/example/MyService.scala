@@ -13,7 +13,7 @@ class MyServiceActor extends Actor with MyService {
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
-  //val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
+  val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
 
   // this actor only runs our route, but you could add
   // other things here, like request stream processing

@@ -24,3 +24,5 @@ libraryDependencies ++= {
 }
 
 Revolver.settings
+
+fork := true
