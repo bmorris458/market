@@ -1,4 +1,4 @@
-package com.example
+package com.github.bmorris458.market
 
 import akka.actor.Actor
 import spray.routing._
@@ -30,10 +30,40 @@ trait MyService extends HttpService {
           complete {
             <html>
               <body>
-                <h1>Say hello to <i>spray-routing</i> on <i>spray-can</i>!</h1>
+                <h1>Welcome to the Maket!</h1>
               </body>
             </html>
           }
+        }
+      }
+    } ~
+    path("users") {
+      get {
+        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+          complete { s"Get all users." }
+        }
+      }
+    } ~
+    path("users" / Segment) { userId =>
+      get {
+        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+          complete {
+            s"Get user entry corresponding to ID: ${userId}"
+          }
+        }
+      }
+    } ~
+    path("items") {
+      get {
+        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+          complete { s"Get all items." }
+        }
+      }
+    } ~
+    path("items" / Segment) { itemId =>
+      get {
+        respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
+          complete { s"Get item entry corresponding to ID: ${itemId}" }
         }
       }
     }
