@@ -36,6 +36,7 @@ class UserProcessor extends PersistentActor {
     case cmd: AddUser => persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => updateWith(event) }
     case cmd: RemoveUser => persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => updateWith(event) }
     case Shutdown =>
+      println("Received shutdown command")
       context.stop(self)
   }
 
