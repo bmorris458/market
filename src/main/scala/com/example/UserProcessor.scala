@@ -18,6 +18,7 @@ sealed trait UserCommand {
 }
 case class AddUser(id: String, expectedVersion: Long, name: String) extends UserCommand
 case class RemoveUser(id: String, expectedVersion: Long) extends UserCommand
+case object Shutdown
 
 sealed trait UserEvent {
   def id: String
@@ -34,6 +35,8 @@ class UserProcessor extends PersistentActor {
   override def receiveCommand: Receive = {
     case cmd: AddUser => persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => updateWith(event) }
     case cmd: RemoveUser => persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => updateWith(event) }
+    case Shutdown =>
+      context.stop(self)
   }
 
   // Not very dry. Fix once everything is running as expected.
