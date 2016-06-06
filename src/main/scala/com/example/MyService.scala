@@ -1,12 +1,18 @@
 package com.github.bmorris458.market
 
-import akka.actor.{Actor, ActorRef, Terminated, Props}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.mutable.ArrayBuffer
+import akka.actor.{Actor, ActorRef, Terminated, Props}
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 import spray.routing._
 import spray.http._
 import MediaTypes._
 
 import processors._
+
+case object GetIndex
 
 class EchoActor extends Actor {
   def receive = {
@@ -15,7 +21,11 @@ class EchoActor extends Actor {
       println("MrEcho: Got the Shutdown message")
       context.stop(self)
     }
-    case _ => println("Neither a string nor a shutdown")
+    case GetIndex => sender ! "Welcome to the Market"
+    case _ => {
+      println("MrEcho: Received an unexpedted object")
+      sender ! "Error: Unknown command on MrEcho"
+    }
   }
 }
 
@@ -49,6 +59,7 @@ class GrimReaper extends Reaper {
 // we want to be able to test it independently, without having to spin up an actor
 class MyServiceActor extends Actor with HttpService {
   import Reaper._
+  implicit val timeout: Timeout = 5.seconds
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
@@ -57,8 +68,8 @@ class MyServiceActor extends Actor with HttpService {
   val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEcho")
   grimReaper ! WatchMe(echoActor)
 
-  val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
-  grimReaper ! WatchMe(userProcessor)
+  //val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
+  //grimReaper ! WatchMe(userProcessor)
 
   // this actor only runs our route, but you could add
   // other things here, like request stream processing
@@ -69,13 +80,13 @@ class MyServiceActor extends Actor with HttpService {
     path("") {
       get {
         respondWithMediaType(`text/html`) { // XML is marshalled to `text/xml` by default, so we simply override here
-          complete {
-            <html>
-              <body>
-                <h1>Welcome to the Maket!</h1>
-              </body>
-            </html>
+          val indexResponseFuture = echoActor ? GetIndex
+          //There's probably a more idiomatic way to do this, but this works
+          var respString = ""
+          indexResponseFuture.onSuccess {
+            case reply: String => respString = reply
           }
+          complete { respString }
         }
       }
     } ~
@@ -123,7 +134,7 @@ class MyServiceActor extends Actor with HttpService {
       get {
         complete {
           echoActor ! Shutdown
-          userProcessor ! Shutdown
+          //userProcessor ! Shutdown
           "Stop message sent"
         }
       }
