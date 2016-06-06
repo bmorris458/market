@@ -11,6 +11,7 @@ import spray.http._
 import MediaTypes._
 
 import processors._
+import processors.common._
 
 case object GetIndex
 
@@ -63,13 +64,13 @@ class MyServiceActor extends Actor with HttpService {
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
-  val grimReaper = actorRefFactory.system.actorOf(Props[GrimReaper], "TheReapersGrim")
+  val grimReaper = actorRefFactory.system.actorOf(Props[GrimReaper], "Otto")
 
-  val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEcho")
+  val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEko")
   grimReaper ! WatchMe(echoActor)
 
-  //val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
-  //grimReaper ! WatchMe(userProcessor)
+  //val userProcessor = actorRefFactory.system.actorOf(Props[CommandProcessor], "user-processor")
+  //grimReaper ! WatchMe(cmdProcessor)
 
   // this actor only runs our route, but you could add
   // other things here, like request stream processing

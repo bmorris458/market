@@ -35,7 +35,7 @@ For example purposes, a Tester actor is also created under System, which sends P
 
 1. Git-clone this repository.
 
-        $ git clone git://github.com/bmorris458/spray-template.git my-project
+        $ git clone git://github.com/bmorris458/market.git my-project
 
 2. Change directory into your clone:
 
@@ -47,9 +47,7 @@ For example purposes, a Tester actor is also created under System, which sends P
 
 6. Browse to [http://localhost:8080](http://localhost:8080/)
 
-7. Stop the application:
-
-        > re-stop
+7. To stop the application, browse to [the stop page](http://localhost:8080/stop)
 
 ##Development direction
 

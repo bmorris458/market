@@ -7,9 +7,13 @@ package com.github.bmorris458.market.processors
 //Basing on CQRS architecture as demonstrated in https://github.com/ironfish/akka-persistence-mongo-samples/tree/master/mongo-cqrs-es-app
 
 import akka.persistence.PersistentActor
+import common._
 import scalaz._
 import Scalaz._
 
+/* * * * * * * * * * * * * * * * * * * * * * * * *
+User-related commands, events, and other objects
+ * * * * * * * * * * * * * * * * * * * * * * * * */
 case class User(id: String, version: Long, name: String)
 
 sealed trait UserCommand {
@@ -18,19 +22,40 @@ sealed trait UserCommand {
 }
 case class AddUser(id: String, expectedVersion: Long, name: String) extends UserCommand
 case class RemoveUser(id: String, expectedVersion: Long) extends UserCommand
-case object Shutdown
 
 sealed trait UserEvent {
+
   def id: String
   def version: Long
 }
 case class UserAdded(id: String, version: Long, name: String) extends UserEvent
 case class UserRemoved(id: String, version: Long) extends UserEvent
 
+/* * * * * * * * * * * * * * * * * * * * * * * * *
+Item-related commands, events, and other objects
+ * * * * * * * * * * * * * * * * * * * * * * * * */
+case class Item(id: String, version: Long, title: String)
+
+sealed trait ItemCommand {
+ def id: String
+ def expectedVersion: Long
+}
+case class AddItem(id: String, expectedVersion: Long, title: String) extends ItemCommand
+case class RemoveItem(id: String, expectedVersion: Long) extends ItemCommand
+
+sealed trait ItemEvent {
+ def id: String
+ def version: Long
+}
+case class ItemAdded(id: String, version: Long, title: String) extends ItemEvent
+case class ItemRemoved(id: String, version: Long) extends ItemEvent
+
+
 // Starting from the persistent actor template in "Reactive Messaging Patterns" p. 355
-class UserProcessor extends PersistentActor {
-  override def persistenceId = "user-processor"
+class CommandProcessor extends PersistentActor {
+  override def persistenceId = "processor"
   var users = Map[String, User]()
+  var items = Map[String, Item]()
 
   override def receiveCommand: Receive = {
     case cmd: AddUser => persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => updateWith(event) }
