@@ -2,6 +2,20 @@
 
 Forked from the (spray-can template)[https://github.com/spray/spray-template], specifically the `on_spray-can_1.3_scala-2.11` branch.
 
+##Model
+
+Underneath the System, the top-level actors are the Router (a.k.a. "Guardian"), the QueryProcessor ("MrEcho"), the CommandProcessor ("Sarge"), and the Reaper ("Otto").
+
+Otto watches any actor that sends a WatchMe request. Currently, Otto only watches Sarge.
+
+Guardian routes incoming HttpRequests, directing PUT requests (commands) to Sarge, and GET requests (queries) to MrEcho. Guardian only waits for a response after sending a query.
+
+Upon receiving a command, Sarge performs any validation implemented, and then transforms successful commands into events, which it sends to MrEcho.
+
+MrEcho maintains the current state of records. Upon receiving a query, it responds to the sender with the query result success or an error message failure. Upon receiving an event, it applies the event to the current state.
+
+For example purposes, a Tester actor is also created under System, which sends PUT requests directly to Guardian to populate the records. Querys can then be generated in a web browser by navigating to localhost:8080 and using the provided links.
+
 ##Design Considerations/Assumptions
 
 * Preliminarily, each user will only have a name, an ID number, and a set of tags that describe subscriptions. Each item for sale will only have a title and a set of tags describing possible subscription criteria (including author, artist, etc.)
