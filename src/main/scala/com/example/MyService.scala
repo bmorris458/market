@@ -52,10 +52,13 @@ class MyServiceActor extends Actor with HttpService {
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
-  //val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
   val grimReaper = actorRefFactory.system.actorOf(Props[GrimReaper], "TheReapersGrim")
+
   val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEcho")
   grimReaper ! WatchMe(echoActor)
+
+  val userProcessor = actorRefFactory.system.actorOf(Props[UserProcessor], "user-processor")
+  grimReaper ! WatchMe(userProcessor)
 
   // this actor only runs our route, but you could add
   // other things here, like request stream processing
@@ -120,6 +123,7 @@ class MyServiceActor extends Actor with HttpService {
       get {
         complete {
           echoActor ! Shutdown
+          userProcessor ! Shutdown
           "Stop message sent"
         }
       }

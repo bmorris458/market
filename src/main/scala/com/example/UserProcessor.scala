@@ -35,15 +35,20 @@ class UserProcessor extends PersistentActor {
   override def receiveCommand: Receive = {
     case cmd: AddUser => persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => updateWith(event) }
     case cmd: RemoveUser => persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => updateWith(event) }
-    case Shutdown =>
-      println("Received shutdown command")
+    case Shutdown => {
+      println("ES Actor: Got the Shutdown message")
       context.stop(self)
+    }
   }
 
   // Not very dry. Fix once everything is running as expected.
   override def receiveRecover: Receive = {
     case evt: UserAdded => updateWith(evt)
     case evt: UserRemoved => updateWith(evt)
+    case Shutdown => {
+      println("ES Actor: Got the Shutdown message")
+      context.stop(self)
+    }
   }
 
   def updateWith[E <: UserEvent](event: E) = {
