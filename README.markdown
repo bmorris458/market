@@ -51,5 +51,18 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 
 ##Development direction
 
-* Add publish-subscribe channel per Vernon, p. 154
+Tasks remaining for core functionality:
+
+* ~~Hook up GetAll queries~~
+* ~~Hook up Remove command for both classes~~
+* Add tag attribute to User and Item objects
+* Hook up AddTag and RemoveTag commands for both classes
+* Hook up GetTags queries for both classes
+* Create NotificationConsumer as recipient of Notification objects
+* Hook up Notifications to be sent as a by-product of AddTag commands
+
+Additional:
+
+* Consider publish-subscribe messaging channel per Vernon, p. 154
 * Add applicative validation with scalaz per https://github.com/ironfish/akka-persistence-mongo-samples
+* Clean up routes (make respond correctly to GETs and PUTs, rather than the sloppy front-end put together for this demo) and add view templates per http://tysonjh.com/blog/2014/05/05/spray-custom-404/

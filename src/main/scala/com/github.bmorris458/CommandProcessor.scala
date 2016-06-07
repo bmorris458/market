@@ -7,19 +7,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.persistence.PersistentActor
 import akka.actor.{ActorRef, Props}
 
-sealed trait UserCommand {
+sealed trait Command {
   def id: String
   def expectedVersion: Long
 }
-case class AddUser(id: String, expectedVersion: Long, name: String) extends UserCommand
-case class RemoveUser(id: String, expectedVersion: Long) extends UserCommand
+case class AddUser(id: String, expectedVersion: Long, name: String) extends Command
+case class RemoveUser(id: String, expectedVersion: Long) extends Command
+case class AddUserTag(id: String, expectedVersion: Long, tag: String) extends Command
+case class RemoveUserTag(id: String, expectedVersion: Long, tag: String) extends Command
 
-sealed trait ItemCommand {
- def id: String
- def expectedVersion: Long
-}
-case class AddItem(id: String, expectedVersion: Long, title: String) extends ItemCommand
-case class RemoveItem(id: String, expectedVersion: Long) extends ItemCommand
+case class AddItem(id: String, expectedVersion: Long, title: String) extends Command
+case class RemoveItem(id: String, expectedVersion: Long) extends Command
+case class AddItemTag(id: String, expectedVersion: Long, tag: String) extends Command
+case class RemoveItemTag(id: String, expectedVersion: Long, tag: String) extends Command
 
 // Starting from the persistent actor template in "Reactive Messaging Patterns" p. 355
 class CommandProcessor extends PersistentActor {
