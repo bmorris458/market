@@ -31,9 +31,13 @@ class CommandProcessor extends PersistentActor {
   override def receiveCommand: Receive = {
     case Hello(ref) => queryProcessor = ref
     case cmd: AddUser =>
-      persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => sendEvent(event) }
+      persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event =>
+        sendEvent(event)
+      }
     case cmd: RemoveUser =>
-      persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => sendEvent(event) }
+      persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event =>
+        sendEvent(event)
+      }
     case Shutdown => {
       println("ES Actor: Got the Shutdown message")
       context.stop(self)
@@ -51,6 +55,7 @@ class CommandProcessor extends PersistentActor {
   }
 
   def sendEvent[E <: Event](event: E) = {
+    //println(s"Sarge: Preparing to send event: UserAdded(${event.id}, ${event.version}, ${event.name})")
     queryProcessor ! event
   }
 }

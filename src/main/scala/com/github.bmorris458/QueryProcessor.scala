@@ -18,9 +18,21 @@ class EchoActor extends Actor {
 
   def receive = {
     case message: String => println(s"MrEko: $message")
-    case GetIndex => sender ! "Welcome to the Market"
     case event: Event => updateWith(event)
-    case query: Query => lookup(sender, query)
+    case GetUser(id) => {
+      val returnAddress = sender
+      lookupUser(id) match {
+        case Some(user) => returnAddress ! user
+        case None => returnAddress ! s"No user found for ${id}"
+      }
+    }
+    case GetItem(id) => {
+      val returnAddress = sender
+      lookupItem(id) match {
+        case Some(item) => returnAddress ! item
+        case None => returnAddress ! s"No item found for ${id}"
+      }
+    }
     case Shutdown => {
       println("MrEko: Got the Shutdown message")
       context.stop(self)
@@ -40,15 +52,6 @@ class EchoActor extends Actor {
     }
   }
 
-  def lookup[Q <: Query](sender: ActorRef, query: Q) = {
-    //Map get returns an option
-    val response = query match {
-      case q: GetUser => users get q.id
-      case q: GetItem => items get q.id
-    }
-    response match {
-      case Some(tgt) => sender ! tgt
-      case None => sender ! None
-    }
-  }
+  def lookupUser(id: String): Option[User] = users get id
+  def lookupItem(id: String): Option[Item] = items get id
 }
