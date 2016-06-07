@@ -30,8 +30,10 @@ class CommandProcessor extends PersistentActor {
 
   override def receiveCommand: Receive = {
     case Hello(ref) => queryProcessor = ref
-    case cmd: AddUser => persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => sendEvent(event) }
-    case cmd: RemoveUser => persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => sendEvent(event) }
+    case cmd: AddUser =>
+      persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event => sendEvent(event) }
+    case cmd: RemoveUser =>
+      persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event => sendEvent(event) }
     case Shutdown => {
       println("ES Actor: Got the Shutdown message")
       context.stop(self)
