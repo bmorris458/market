@@ -20,15 +20,14 @@ case class GetItem(id: String) extends ItemQuery
 case class GetItemsWithTag(tag: String) extends ItemQuery
 
 /**** Event System Objects ****/
+trait Record
+case class User(id: String, version: Long, name: String, tags: Set[String]) extends Record
+case class Item(id: String, version: Long, title: String, tags: Set[String]) extends Record
 
 sealed trait Event {
   def id: String
   def version: Long
 }
-
-trait Record
-case class User(id: String, version: Long, name: String) extends Record
-case class Item(id: String, version: Long, title: String) extends Record
 
 /* * * * * * * * * * * * * * * * * * * * * * * * *
 User-related events, and other objects

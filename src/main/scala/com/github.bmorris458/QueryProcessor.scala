@@ -1,6 +1,7 @@
 package com.github.bmorris458.market.processors
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.mutable.Map
 import akka.actor.{Actor, ActorRef}
 
 /*
@@ -36,10 +37,29 @@ class EchoActor extends Actor {
 
   def updateWith[E <: Event](event: E) = {
     event match {
-      case e: UserAdded => { users = users + (e.id -> User(e.id, e.version, e.name)); println(s"MrEko: Adding user with id: ${e.id}") }
+      case e: UserAdded => { users = users + (e.id -> User(e.id, e.version, e.name, Set[String]())); println(s"MrEko: Adding user with id: ${e.id}") }
       case e: UserRemoved => { users = users - e.id; println(s"MrEko: Removing user with id: ${e.id}") }
-      case e: ItemAdded => { items = items + (e.id -> Item(e.id, e.version, e.title)); println(s"MrEko: Adding item with id: ${e.id}") }
+      case e: UserTagAdded => (users get e.id) match {
+        case Some(u) => { users = users + (e.id -> User(u.id, e.version, u.name, u.tags + e.tag)); println(s"MrEko: Adding tag ${e.tag} to user with id: ${e.id}") }
+        case None =>
+      }
+      case e: UserTagRemoved => (users get e.id) match {
+        case Some(u) => { users = users + (e.id -> User(u.id, e.version, u.name, u.tags - e.tag)); println(s"MrEko: Removing tag ${e.tag} from user with id: ${e.id}") }
+        case None =>
+      }
+      case e: ItemAdded => { items = items + (e.id -> Item(e.id, e.version, e.title, Set[String]())); println(s"MrEko: Adding item with id: ${e.id}") }
       case e: ItemRemoved => { items = items - e.id; println(s"MrEko: Removing item with id: ${e.id}") }
+      case e: ItemTagAdded => {
+        val item = items get e.id
+        item match {
+          case Some(i) => { items = items + (e.id -> Item(i.id, e.version, i.title, i.tags + e.tag)); println(s"MrEko: Adding tag ${e.tag} to item with id: ${e.id}") }
+          case None =>
+        }
+      }
+      case e: ItemTagRemoved => (items get e.id) match {
+        case Some(i) => { items = items + (e.id -> Item(i.id, e.version, i.title, i.tags - e.tag)); println(s"MrEko: Removing tag ${e.tag} from item with id: ${e.id}") }
+        case None =>
+      }
     }
   }
 

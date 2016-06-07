@@ -33,12 +33,30 @@ class CommandProcessor extends PersistentActor {
       persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event =>
         sendEvent(event)
       }
+    //Tag commands should really include a query and validation to ensure that the target exists.
+    case cmd: AddUserTag =>
+      persist(UserTagAdded(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
+        sendEvent(event)
+      }
+    case cmd: RemoveUserTag =>
+      persist(UserTagRemoved(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
+        sendEvent(event)
+      }
     case cmd: RemoveUser =>
       persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event =>
         sendEvent(event)
       }
       case cmd: AddItem =>
         persist(ItemAdded(cmd.id, cmd.expectedVersion, cmd.title)) { event =>
+          sendEvent(event)
+        }
+      //Tag commands should really include a query and validation to ensure that the target exists.
+      case cmd: AddItemTag =>
+        persist(ItemTagAdded(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
+          sendEvent(event)
+        }
+      case cmd: RemoveItemTag =>
+        persist(ItemTagRemoved(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
           sendEvent(event)
         }
       case cmd: RemoveItem =>
