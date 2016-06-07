@@ -26,10 +26,10 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 
 * Updated to Akka 2.4.6 and Scala 2.11.8
 * Added `reference.conf` per (the Akka Persistence docs)[http://doc.akka.io/docs/akka/2.4.7/scala/persistence.html#Local_LevelDB_journal]
-* Added a hierarchical controller using the template from Vernon, "Reactive Messaging Patterns with the Actor Model" ch. 2, to avoid dead letters (most actor patterns were learned from Vernon).
 * Modified `build.sbt` with fork workaround per (this post)[http://stackoverflow.com/questions/19425613/unsatisfiedlinkerror-with-native-library-under-sbt] (This is a known sbt issue, having to do with native library exportation and the jvm classpath. See (the eventsourced documentation)[https://github.com/eligosource/eventsourced/wiki/Installation#native])
 * Added a Reaper pattern for clean shutdown of web server and unlocking of database per (shutdown patterns in akka)[http://letitcrash.com/post/30165507578/shutdown-patterns-in-akka-2]
 * Utilized the Spray.io routing techniques described in (the spray-routing documentation)[http://spray.io/documentation/1.2.3/spray-routing/#spray-routing]
+* Queries handled with ask pattern per (Alvin Alexander's blog)[http://alvinalexander.com/scala/scala-akka-actors-ask-examples-future-await-timeout-result]
 
 ##To get started
 
