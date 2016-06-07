@@ -13,7 +13,6 @@ import spray.http._
 import MediaTypes._
 
 import processors._
-import processors.common._
 
 /* * * * * * * * * * * * * * * * * * * * * * * * *
 Reaper to ensure clean shutdown of system
@@ -55,12 +54,29 @@ class MyServiceActor extends Actor with HttpService {
   def actorRefFactory = context
   val grimReaper = actorRefFactory.system.actorOf(Props[GrimReaper], "Otto")
 
-  val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEko")
+  //val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEko")
   val cmdProcessor = actorRefFactory.system.actorOf(Props[CommandProcessor], "Sarge")
-  cmdProcessor ! Hello(echoActor) //Introduce Sarge to MrEko, so Sarge knows where to send Events
   grimReaper ! WatchMe(cmdProcessor) //Set Otto's shutdown hook on Sarge
 
-  def receive = runRoute(myRoute)
+  //Send command to get MrEko's ActorRef
+  var echoActor: ActorRef = _
+  override def preStart(): Unit = {
+     context.become(receiveEchoActor)
+   }
+  cmdProcessor ! SayHello
+
+  def receive = receiveEchoActor
+
+  def receiveEchoActor: Receive = {
+    case Hello(ref) => {
+      echoActor = ref
+      println("Guardian: Ready to receive routes")
+      context.become(receiveRoutes)
+    }
+    case _ => sender ! "Please introduce yourself"
+  }
+
+  def receiveRoutes: Receive = runRoute(myRoute)
 
   val myRoute =
     path("") {

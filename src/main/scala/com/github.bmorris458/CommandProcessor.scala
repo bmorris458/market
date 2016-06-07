@@ -4,10 +4,7 @@ package com.github.bmorris458.market.processors
 //Actors and messaging system based on design patterns in "Reactive Messaging Patterns with the Actor Model", Vaugh Vernon, 2016
 
 import akka.persistence.PersistentActor
-import akka.actor.ActorRef
-import common._
-//import scalaz._
-//import Scalaz._
+import akka.actor.{ActorRef, Props}
 
 sealed trait UserCommand {
   def id: String
@@ -26,10 +23,11 @@ case class RemoveItem(id: String, expectedVersion: Long) extends ItemCommand
 // Starting from the persistent actor template in "Reactive Messaging Patterns" p. 355
 class CommandProcessor extends PersistentActor {
   override def persistenceId = "Sarge"
-  var queryProcessor: ActorRef = _
+  val queryProcessor = context.actorOf(Props[EchoActor], "MrEko")
 
   override def receiveCommand: Receive = {
-    case Hello(ref) => queryProcessor = ref
+    case SayHello => sender ! Hello(queryProcessor) //Introduce Guardian to MrEko, so Guardian knows where to send queries
+    case "Please introduce yourself" => sender ! Hello(queryProcessor) //Guardian uninitialized, reintroduce MrEko
     case cmd: AddUser =>
       persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event =>
         sendEvent(event)
@@ -38,7 +36,14 @@ class CommandProcessor extends PersistentActor {
       persist(UserRemoved(cmd.id, cmd.expectedVersion)) { event =>
         sendEvent(event)
       }
-    case Shutdown => {
+      case cmd: AddItem =>
+        persist(ItemAdded(cmd.id, cmd.expectedVersion, cmd.title)) { event =>
+          sendEvent(event)
+        }
+      case cmd: RemoveItem =>
+        persist(ItemRemoved(cmd.id, cmd.expectedVersion)) { event =>
+          sendEvent(event)
+        }    case Shutdown => {
       println("ES Actor: Got the Shutdown message")
       context.stop(self)
     }
@@ -56,8 +61,10 @@ class CommandProcessor extends PersistentActor {
   //before the queryProcessor has been identified, so the message target is null.
   //@todo: figure out a way to hook that up before the recovery begins.
   override def receiveRecover: Receive = {
-    case evt: UserAdded => sendEvent(evt)
-    case evt: UserRemoved => sendEvent(evt)
+    case evt: Event => sendEvent(evt)
+//    case evt: UserRemoved => sendEvent(evt)
+//    case evt: ItemAdded => sendEvent(evt)
+//    case evt: ItemRemoved => sendEvent(evt)
     case Shutdown => {
       println("ES Actor: Got the Shutdown message")
       context.stop(self)

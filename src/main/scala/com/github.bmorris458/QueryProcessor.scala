@@ -1,7 +1,6 @@
 package com.github.bmorris458.market.processors
 
 import akka.actor.{Actor, ActorRef}
-import common._
 
 /*
 EchoActor serves queries.

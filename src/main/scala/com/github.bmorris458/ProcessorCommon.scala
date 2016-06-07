@@ -1,10 +1,11 @@
-package com.github.bmorris458.market.processors.common
+package com.github.bmorris458.market.processors
 
 import akka.actor.ActorRef
 
 /**** Actor Control Objects ****/
 case object Shutdown
 case class Hello(ref: ActorRef)
+case object SayHello
 
 /**** Query System Objects ****/
 trait UserQuery
