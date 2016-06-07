@@ -1,5 +1,6 @@
 package com.github.bmorris458.market.processors
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{Actor, ActorRef}
 
 /*
@@ -19,8 +20,8 @@ class EchoActor extends Actor {
     case event: Event => updateWith(event)
     //The first incoming query is responding correctly, but all subsequent futures
     //fail to complete.
-    case GetUser(id) => sender ! lookupUser(id)
-    case GetItem(id) => sender ! lookupItem(id)
+    case GetUser(id) => sender() ! lookupUser(id)
+    case GetItem(id) => sender() ! lookupItem(id)
     case Shutdown => {
       println("MrEko: Got the Shutdown message")
       context.stop(self)
@@ -33,13 +34,19 @@ class EchoActor extends Actor {
 
   def updateWith[E <: Event](event: E) = {
     event match {
-      case e: UserAdded => { users = users + (e.id -> User(e.id, e.version, e.name)); println(s"Adding user with id: ${e.id}") }
-      case e: UserRemoved => { users = users - e.id; println(s"Removing user with id: ${e.id}") }
-      case e: ItemAdded => { items = items + (e.id -> Item(e.id, e.version, e.title)); println(s"Adding item with id: ${e.id}") }
-      case e: ItemRemoved => { items = items - e.id; println(s"Removing item with id: ${e.id}") }
+      case e: UserAdded => { users = users + (e.id -> User(e.id, e.version, e.name)); println(s"MrEko: Adding user with id: ${e.id}") }
+      case e: UserRemoved => { users = users - e.id; println(s"MrEko: Removing user with id: ${e.id}") }
+      case e: ItemAdded => { items = items + (e.id -> Item(e.id, e.version, e.title)); println(s"MrEko: Adding item with id: ${e.id}") }
+      case e: ItemRemoved => { items = items - e.id; println(s"MrEko: Removing item with id: ${e.id}") }
     }
   }
 
-  def lookupUser(id: String): Option[User] = users get id
-  def lookupItem(id: String): Option[Item] = items get id
+  def lookupUser(id: String): String = (users get id) match {
+    case Some(u) => u.toString
+    case None => "No user found for that ID"
+  }
+  def lookupItem(id: String): String = (items get id) match {
+    case Some(i) => i.toString
+    case None => "No item found for that ID"
+  }
 }

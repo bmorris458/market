@@ -3,6 +3,7 @@ package com.github.bmorris458.market.processors
 //Base applicative validation portion on CQRS architecture as demonstrated in https://github.com/ironfish/akka-persistence-mongo-samples/tree/master/mongo-cqrs-es-app
 //Actors and messaging system based on design patterns in "Reactive Messaging Patterns with the Actor Model", Vaugh Vernon, 2016
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import akka.persistence.PersistentActor
 import akka.actor.{ActorRef, Props}
 

@@ -108,14 +108,7 @@ class MyServiceActor extends Actor with HttpService {
       get {
         complete {
           var userResponseFuture = echoActor ? GetUser(userId)
-          //Initialize with failure condition. Overwrite if successful.
-          var resp = "User not found"
-          userResponseFuture onComplete {
-            case Success(r) => resp = r.toString
-            case Failure(_) => resp = "Got an unexpected response"
-          }
-          Await.ready(userResponseFuture, 5 seconds)
-          resp
+          Await.result(userResponseFuture, timeout.duration).toString
         }
       }
     } ~
@@ -140,14 +133,7 @@ class MyServiceActor extends Actor with HttpService {
       get {
         complete {
           var itemResponseFuture = echoActor ? GetItem(itemId)
-          //Initialize with failure condition. Overwrite if successful.
-          var resp = "Item not found"
-          itemResponseFuture onComplete {
-            case Success(r) => resp = r.toString
-            case Failure(_) => resp = "Got an unexpected response"
-          }
-          Await.ready(itemResponseFuture, 5 seconds)
-          resp
+          Await.result(itemResponseFuture, timeout.duration).toString
         }
       }
     } ~
