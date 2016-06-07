@@ -17,18 +17,10 @@ class EchoActor extends Actor {
   def receive = {
     case message: String => println(s"MrEko: $message")
     case event: Event => updateWith(event)
+    //The first incoming query is responding correctly, but all subsequent futures
+    //fail to complete.
     case GetUser(id) => sender ! lookupUser(id)
-    case GetItem(id) => {
-      var returnAddress = sender
-      lookupItem(id) match {
-        case Some(item) => {
-          println(s"Found item $item")
-          //This is working on first request, then failing on subsequent. Is the returnAddress getting stashed and stale?
-          returnAddress ! item
-        }
-        case None => returnAddress ! s"No item found for ${id}"
-      }
-    }
+    case GetItem(id) => sender ! lookupItem(id)
     case Shutdown => {
       println("MrEko: Got the Shutdown message")
       context.stop(self)
