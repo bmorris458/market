@@ -60,6 +60,7 @@ class MyServiceActor extends Actor with HttpService {
 
   //Send command to get MrEko's ActorRef
   var echoActor: ActorRef = _
+  //@todo: Not sure if this is necessary. Test commenting it out once other functionality is stable.
   override def preStart(): Unit = {
      context.become(receiveEchoActor)
    }
@@ -106,14 +107,14 @@ class MyServiceActor extends Actor with HttpService {
     path("users" / Segment) { userId =>
       get {
         complete {
-          val userResponseFuture = echoActor ? GetUser(userId)
+          var userResponseFuture = echoActor ? GetUser(userId)
           //Initialize with failure condition. Overwrite if successful.
           var resp = "User not found"
           userResponseFuture onComplete {
-            case Success(u) => resp = s"$u"
+            case Success(r) => resp = r.toString
             case Failure(_) => resp = "Got an unexpected response"
           }
-          Await.ready(userResponseFuture, 1 seconds)
+          Await.ready(userResponseFuture, 5 seconds)
           resp
         }
       }
@@ -138,14 +139,14 @@ class MyServiceActor extends Actor with HttpService {
     path("items" / Segment) { itemId =>
       get {
         complete {
-          val itemResponseFuture = echoActor ? GetItem(itemId)
+          var itemResponseFuture = echoActor ? GetItem(itemId)
           //Initialize with failure condition. Overwrite if successful.
           var resp = "Item not found"
           itemResponseFuture onComplete {
-            case Success(i) => resp = s"$i"
+            case Success(r) => resp = r.toString
             case Failure(_) => resp = "Got an unexpected response"
           }
-          Await.ready(itemResponseFuture, 1 seconds)
+          Await.ready(itemResponseFuture, 5 seconds)
           resp
         }
       }

@@ -4,17 +4,17 @@ Forked from the (spray-can template)[https://github.com/spray/spray-template], s
 
 ##Model
 
-Underneath the System, the top-level actors are the Router (a.k.a. "Guardian"), the QueryProcessor ("MrEcho"), the CommandProcessor ("Sarge"), and the Reaper ("Otto").
+Underneath the System, the top-level actors are the Router (a.k.a. "Guardian"), the CommandProcessor ("Sarge"), and the Reaper ("Otto"). Underneath Sarge is the QueryProcessor ("MrEcho").
 
 Otto watches any actor that sends a WatchMe request. Currently, Otto only watches Sarge.
 
 Guardian routes incoming HttpRequests, directing PUT requests (commands) to Sarge, and GET requests (queries) to MrEcho. Guardian only waits for a response after sending a query.
 
-Upon receiving a command, Sarge performs any validation implemented, and then transforms successful commands into events, which it sends to MrEcho.
+Sarge creates MrEko, then introduces it to Guardian so Guardian can send queries. Upon receiving a command, Sarge performs any validation implemented, and then transforms successful commands into events, which it sends to MrEcho.
 
 MrEcho maintains the current state of records. Upon receiving a query, it responds to the sender with the query result success or an error message failure. Upon receiving an event, it applies the event to the current state.
 
-For example purposes, a Tester actor is also created under System, which sends PUT requests directly to Guardian to populate the records. Querys can then be generated in a web browser by navigating to localhost:8080 and using the provided links.
+For example purposes, Commands and Queries can be generated in a web browser by navigating to localhost:8080 and using the provided links.
 
 ##Design Considerations/Assumptions
 
@@ -51,6 +51,5 @@ For example purposes, a Tester actor is also created under System, which sends P
 
 ##Development direction
 
-* Add persistent query actor per http://doc.akka.io/docs/akka/2.4.6/scala/persistence-query.html#persistence-query-scala
 * Add publish-subscribe channel per Vernon, p. 154
 * Add applicative validation with scalaz per https://github.com/ironfish/akka-persistence-mongo-samples

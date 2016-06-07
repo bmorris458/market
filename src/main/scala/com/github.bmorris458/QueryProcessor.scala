@@ -8,8 +8,7 @@ EchoActor serves queries.
   Event objects are handled by `updateWith`
   Query objects are handled by `lookup`
   Shutdown object triggers actor stop
-  GetIndex returns packet needed to render landing page
-  Anything else replies with a None (which spray interprets as a 404)
+  Anything else replies with a None (which should trigger a 404)
 */
 class EchoActor extends Actor {
   var users = Map[String, User]()
@@ -18,17 +17,15 @@ class EchoActor extends Actor {
   def receive = {
     case message: String => println(s"MrEko: $message")
     case event: Event => updateWith(event)
-    case GetUser(id) => {
-      val returnAddress = sender
-      lookupUser(id) match {
-        case Some(user) => returnAddress ! user
-        case None => returnAddress ! s"No user found for ${id}"
-      }
-    }
+    case GetUser(id) => sender ! lookupUser(id)
     case GetItem(id) => {
-      val returnAddress = sender
+      var returnAddress = sender
       lookupItem(id) match {
-        case Some(item) => returnAddress ! item
+        case Some(item) => {
+          println(s"Found item $item")
+          //This is working on first request, then failing on subsequent. Is the returnAddress getting stashed and stale?
+          returnAddress ! item
+        }
         case None => returnAddress ! s"No item found for ${id}"
       }
     }
@@ -44,10 +41,10 @@ class EchoActor extends Actor {
 
   def updateWith[E <: Event](event: E) = {
     event match {
-      case e: UserAdded => users = users + (e.id -> User(e.id, e.version, e.name))
-      case e: UserRemoved => users = users - e.id
-      case e: ItemAdded => items = items + (e.id -> Item(e.id, e.version, e.title))
-      case e: ItemRemoved => items = items - e.id
+      case e: UserAdded => { users = users + (e.id -> User(e.id, e.version, e.name)); println(s"Adding user with id: ${e.id}") }
+      case e: UserRemoved => { users = users - e.id; println(s"Removing user with id: ${e.id}") }
+      case e: ItemAdded => { items = items + (e.id -> Item(e.id, e.version, e.title)); println(s"Adding item with id: ${e.id}") }
+      case e: ItemRemoved => { items = items - e.id; println(s"Removing item with id: ${e.id}") }
     }
   }
 
