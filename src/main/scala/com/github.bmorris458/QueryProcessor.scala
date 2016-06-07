@@ -21,7 +21,9 @@ class EchoActor extends Actor {
     //The first incoming query is responding correctly, but all subsequent futures
     //fail to complete.
     case GetUser(id) => sender() ! lookupUser(id)
+    case GetAllUsers => sender() ! allUsers()
     case GetItem(id) => sender() ! lookupItem(id)
+    case GetAllItems => sender() ! allItems()
     case Shutdown => {
       println("MrEko: Got the Shutdown message")
       context.stop(self)
@@ -45,8 +47,10 @@ class EchoActor extends Actor {
     case Some(u) => u.toString
     case None => "No user found for that ID"
   }
+  def allUsers(): List[String] = users.values.toList.map( x => x.toString).sorted
   def lookupItem(id: String): String = (items get id) match {
     case Some(i) => i.toString
     case None => "No item found for that ID"
   }
+  def allItems(): List[String] = items.values.toList.map( x => x.toString).sorted
 }

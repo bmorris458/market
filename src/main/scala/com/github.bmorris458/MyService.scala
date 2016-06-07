@@ -53,8 +53,6 @@ class MyServiceActor extends Actor with HttpService {
 
   def actorRefFactory = context
   val grimReaper = actorRefFactory.system.actorOf(Props[GrimReaper], "Otto")
-
-  //val echoActor = actorRefFactory.system.actorOf(Props[EchoActor], "MrEko")
   val cmdProcessor = actorRefFactory.system.actorOf(Props[CommandProcessor], "Sarge")
   grimReaper ! WatchMe(cmdProcessor) //Set Otto's shutdown hook on Sarge
 
@@ -90,8 +88,11 @@ class MyServiceActor extends Actor with HttpService {
     path("users") {
       get {
         complete {
-
-          s"Command issued: Get all users."
+          var allUsersF = echoActor ? GetAllUsers
+          Await.result(allUsersF, timeout.duration) match {
+            case ls: List[String] => ls.mkString("\n")
+            case _ => "Unexpected response type"
+          }
         }
       }
     } ~
@@ -107,16 +108,19 @@ class MyServiceActor extends Actor with HttpService {
     path("users" / Segment) { userId =>
       get {
         complete {
-          var userResponseFuture = echoActor ? GetUser(userId)
-          Await.result(userResponseFuture, timeout.duration).toString
+          var userF = echoActor ? GetUser(userId)
+          Await.result(userF, timeout.duration).toString
         }
       }
     } ~
     path("items") {
       get {
         complete {
-
-          s"Get all items."
+          var allItemsF = echoActor ? GetAllItems
+          Await.result(allItemsF, timeout.duration) match {
+            case ls: List[String] => ls.mkString("\n")
+            case _ => "Unexpected response type"
+          }
         }
       }
     } ~
@@ -132,8 +136,8 @@ class MyServiceActor extends Actor with HttpService {
     path("items" / Segment) { itemId =>
       get {
         complete {
-          var itemResponseFuture = echoActor ? GetItem(itemId)
-          Await.result(itemResponseFuture, timeout.duration).toString
+          var itemF = echoActor ? GetItem(itemId)
+          Await.result(itemF, timeout.duration).toString
         }
       }
     } ~

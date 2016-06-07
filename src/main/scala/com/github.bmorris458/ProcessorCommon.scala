@@ -10,10 +10,11 @@ case object SayHello
 /**** Query System Objects ****/
 trait UserQuery
 case class GetUser(id: String) extends UserQuery
+case object GetAllUsers extends UserQuery
 
 trait ItemQuery
 case class GetItem(id: String) extends ItemQuery
-
+case object GetAllItems extends ItemQuery
 /**** Event System Objects ****/
 
 sealed trait Event {

@@ -51,5 +51,6 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 
 ##Development direction
 
-* Add publish-subscribe channel per Vernon, p. 154
+* Consider publish-subscribe messaging channel per Vernon, p. 154
 * Add applicative validation with scalaz per https://github.com/ironfish/akka-persistence-mongo-samples
+* Clean up routes (make respond correctly to GETs and PUTs, rather than the sloppy front-end put together for this demo) and add view templates per http://tysonjh.com/blog/2014/05/05/spray-custom-404/
