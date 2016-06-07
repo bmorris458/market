@@ -105,6 +105,15 @@ class MyServiceActor extends Actor with HttpService {
         }
       }
     } ~
+    path("users" / "remove") {
+      //example: localhost:8080/users/remove?id=123
+      parameters('id) { id =>
+        complete {
+          cmdProcessor ! RemoveUser(id, 1L)
+          s"Sending command: Remove user $id"
+        }
+      }
+    } ~
     path("users" / Segment) { userId =>
       get {
         complete {
@@ -130,6 +139,15 @@ class MyServiceActor extends Actor with HttpService {
         complete {
           cmdProcessor ! AddItem(id, 0L, title)
           s"Sending command: Add user $id: $title"
+        }
+      }
+    } ~
+    path("items" / "remove") {
+      //example: localhost:8080/users/remove?id=123
+      parameters('id) { id =>
+        complete {
+          cmdProcessor ! RemoveItem(id, 1L)
+          s"Sending command: Remove item $id"
         }
       }
     } ~
