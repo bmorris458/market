@@ -54,6 +54,7 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 Tasks remaining for core functionality:
 
 * ~~Hook up GetAll queries~~
+* Hook up Remove command for both classes
 * Add tag attribute to User and Item objects
 * Hook up AddTag and RemoveTag commands for both classes
 * Hook up GetTags queries for both classes

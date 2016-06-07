@@ -90,7 +90,7 @@ class MyServiceActor extends Actor with HttpService {
         complete {
           var allUsersF = echoActor ? GetAllUsers
           Await.result(allUsersF, timeout.duration) match {
-            case ls: List[String] => ls.mkString("\n")
+            case ls: List[String] @unchecked => ls.mkString("\n")
             case _ => "Unexpected response type"
           }
         }
@@ -118,7 +118,7 @@ class MyServiceActor extends Actor with HttpService {
         complete {
           var allItemsF = echoActor ? GetAllItems
           Await.result(allItemsF, timeout.duration) match {
-            case ls: List[String] => ls.mkString("\n")
+            case ls: List[String] @unchecked => ls.mkString("\n")
             case _ => "Unexpected response type"
           }
         }
