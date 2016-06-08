@@ -6,7 +6,9 @@ import akka.actor.ActorRef
 case object Shutdown
 case object SayHello
 case class Hello(ref: ActorRef)
-case class SubscriptionNotification(userId: String, itemId: String)
+case class WatchTag(tag: String)
+case class UnwatchTag(tag: String)
+case object UnwatchAllTags
 
 /**** Query System Objects ****/
 trait UserQuery
@@ -19,17 +21,17 @@ case object GetAllItems extends ItemQuery
 case class GetItem(id: String) extends ItemQuery
 case class GetItemsWithTag(tag: String) extends ItemQuery
 
+case class GetNotifications(id: String)
+
 /**** Event System Objects ****/
+trait Record
+case class User(id: String, version: Long, name: String, tags: Set[String], watcher: ActorRef) extends Record
+case class Item(id: String, version: Long, title: String, tags: Set[String]) extends Record
 
 sealed trait Event {
   def id: String
   def version: Long
 }
-
-trait Record
-case class User(id: String, version: Long, name: String) extends Record
-case class Item(id: String, version: Long, title: String) extends Record
-
 /* * * * * * * * * * * * * * * * * * * * * * * * *
 User-related events, and other objects
  * * * * * * * * * * * * * * * * * * * * * * * * */

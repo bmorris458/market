@@ -100,8 +100,27 @@ class MyServiceActor extends Actor with HttpService {
       //example: localhost:8080/users/add?id=123&name=Ben
       parameters('id, 'name ? "JoeSmith") { (id, name) =>
         complete {
+          //val watcher = actorRefFactory.system.
           cmdProcessor ! AddUser(id, 0L, name)
           s"Sending command: Add user $id: $name"
+        }
+      }
+    } ~
+    path("users" / "addtag") {
+      //example: localhost:8080/users/addtag?id=123&tag=Black Widow
+      parameters('id, 'tag ? "any") { (id, tag) =>
+        complete {
+          cmdProcessor ! AddUserTag(id, 0L, tag)
+          s"Sending command: Add tag $tag to user $id"
+        }
+      }
+    } ~
+    path("users" / "removetag") {
+      //example: localhost:8080/users/removetag?id=123&tag=Black Widow
+      parameters('id, 'tag ? "any") { (id, tag) =>
+        complete {
+          cmdProcessor ! RemoveUserTag(id, 0L, tag)
+          s"Sending command: Remove tag $tag from user $id"
         }
       }
     } ~
@@ -114,7 +133,14 @@ class MyServiceActor extends Actor with HttpService {
         }
       }
     } ~
-    path("users" / Segment) { userId =>
+    path("users" / Segment / "notifications") { userId =>
+      get {
+        complete {
+          var noteF = echoActor ? GetNotifications(userId)
+          Await.result(noteF, timeout.duration).toString
+        }
+      }
+    } ~    path("users" / Segment) { userId =>
       get {
         complete {
           var userF = echoActor ? GetUser(userId)
@@ -142,7 +168,24 @@ class MyServiceActor extends Actor with HttpService {
         }
       }
     } ~
-    path("items" / "remove") {
+    path("items" / "addtag") {
+      //example: localhost:8080/users/addtag?id=123&tag=Black Widow
+      parameters('id, 'tag ? "any") { (id, tag) =>
+        complete {
+          cmdProcessor ! AddItemTag(id, 0L, tag)
+          s"Sending command: Add tag $tag to item $id"
+        }
+      }
+    } ~
+    path("items" / "removetag") {
+      //example: localhost:8080/users/addtag?id=123&tag=Black Widow
+      parameters('id, 'tag ? "any") { (id, tag) =>
+        complete {
+          cmdProcessor ! RemoveItemTag(id, 0L, tag)
+          s"Sending command: Remove tag $tag from item $id"
+        }
+      }
+    } ~    path("items" / "remove") {
       //example: localhost:8080/users/remove?id=123
       parameters('id) { id =>
         complete {
@@ -176,18 +219,24 @@ class MyServiceActor extends Actor with HttpService {
         <ul>
           <li><a href="/users">Query all users</a></li>
           <li><a href="/users/add?id=a101&name=Ben">Add user Ben with ID a101</a></li>
+          <li><a href="/users/addtag?id=a101&tag=Black Widow">Add a subscription to Ben</a></li>
+          <li><a href="/users/removetag?id=a101&tag=Black Widow">Remove a subscription from Ben</a></li>
           <li><a href="/users/add?id=a102&name=Sally">Add user Sally with ID a102</a></li>
           <li><a href="/users/a101">Query user a101</a></li>
           <li><a href="/users/a102">Query user a102</a></li>
+          <li><a href="/users/a101/notifications">Check notifications for Ben</a></li>
           <li><a href="/users/remove?id=a101">Remove user Ben</a></li>
           <li><a href="/users/remove?id=a102">Remove user Sally</a></li>
+          <br>
           <li><a href="/items">Query all items</a></li>
           <li><a href="/items/add?id=q2101&title=Black Widow">Add item Black Widow with ID q2101</a></li>
+          <li><a href="/items/addtag?id=q2101&tag=Black Widow">Add a tag to Black Widow</a></li>
           <li><a href="/items/add?id=q2102&title=Red Sonja">Add item Red Sonja with ID q2102</a></li>
           <li><a href="/items/q2101">Query item q2101</a></li>
           <li><a href="/items/q2102">Query item q2102</a></li>
           <li><a href="/items/remove?id=q2101">Remove item Black Widow</a></li>
           <li><a href="/items/remove?id=q2102">Remove item Red Sonja</a></li>
+          <br>
           <li><a href="/stop?method=post">Stop server</a></li>
         </ul>
       </body>
