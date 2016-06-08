@@ -1,6 +1,6 @@
 organization  := "com.github.bmorris458"
 
-version       := "0.10.0"
+version       := "0.11.0"
 
 scalaVersion  := "2.11.8"
 

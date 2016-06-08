@@ -57,8 +57,8 @@ Tasks remaining for core functionality:
 * ~~Hook up Remove command for both classes~~
 * ~~Add tag attribute to User and Item objects~~
 * ~~Hook up AddTag and RemoveTag commands for both classes~~
-* Create NotificationConsumer as recipient of Notification objects
-* Hook up Notifications to be sent as a by-product of AddTag commands
+* ~~Create Subscriber as recipient of Notification objects~~
+* ~~Hook up Notifications to be sent as a by-product of AddTag and RemoveItem commands~~
 
 Additional:
 

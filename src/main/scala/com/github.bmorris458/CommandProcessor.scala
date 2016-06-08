@@ -25,6 +25,7 @@ case class RemoveItemTag(id: String, expectedVersion: Long, tag: String) extends
 class CommandProcessor extends PersistentActor {
   override def persistenceId = "Sarge"
   val queryProcessor = context.actorOf(Props[EchoActor], "MrEko")
+  val publisher = context.actorOf(Props[NotificationPublisher], "Gutenburg")
 
   override def receiveCommand: Receive = {
     case SayHello => sender ! Hello(queryProcessor) //Introduce Guardian to MrEko, so Guardian knows where to send queries
@@ -51,21 +52,26 @@ class CommandProcessor extends PersistentActor {
           sendEvent(event)
         }
       //Tag commands should really include a query and validation to ensure that the target exists.
-      case cmd: AddItemTag =>
+      case cmd: AddItemTag => {
+        publisher ! NewItemTagAlert(cmd.id, cmd.tag)
         persist(ItemTagAdded(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
           sendEvent(event)
         }
+      }
       case cmd: RemoveItemTag =>
         persist(ItemTagRemoved(cmd.id, cmd.expectedVersion, cmd.tag)) { event =>
           sendEvent(event)
         }
-      case cmd: RemoveItem =>
+      case cmd: RemoveItem => {
+        publisher ! ItemSoldAlert(cmd.id)
         persist(ItemRemoved(cmd.id, cmd.expectedVersion)) { event =>
           sendEvent(event)
-        }    case Shutdown => {
-      println("ES Actor: Got the Shutdown message")
-      context.stop(self)
-    }
+        }
+      }
+      case Shutdown => {
+        println("ES Actor: Got the Shutdown message")
+        context.stop(self)
+      }
   }
 
   override def receiveRecover: Receive = {
