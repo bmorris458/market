@@ -1,6 +1,6 @@
 #Market
 
-Forked from the (spray-can template)[https://github.com/spray/spray-template], specifically the `on_spray-can_1.3_scala-2.11` branch.
+Forked from the [spray-can template](https://github.com/spray/spray-template), specifically the `on_spray-can_1.3_scala-2.11` branch.
 
 ##Model
 
@@ -10,11 +10,11 @@ Otto watches any actor that sends a WatchMe request. Currently, Otto only watche
 
 Guardian routes incoming HttpRequests, directing PUT requests (commands) to Sarge, and GET requests (queries) to MrEcho. Guardian only waits for a response after sending a query.
 
-Sarge creates MrEko, then introduces it to Guardian so Guardian can send queries. Upon receiving a command, Sarge performs any validation implemented, and then transforms successful commands into events, which it sends to MrEcho.
+Sarge creates MrEko, then introduces it to Guardian so Guardian can send queries. Upon receiving a command, Sarge performs any validation implemented, and then transforms successful commands into events, which it sends to MrEcho. Sarge also creates Gutenburg, which publishes notifications to the standard event stream.
 
-MrEcho maintains the current state of records. Upon receiving a query, it responds to the sender with the query result success or an error message failure. Upon receiving an event, it applies the event to the current state.
+MrEcho maintains the current state of records (including creating the actual User and Item objects, and the subscription watcher actors associated with each User). Upon receiving a query, it responds to the sender with the query result success or an error message failure. Upon receiving an event, it applies the event to the current state. The subscriber for each user watches the event stream and keeps track of notifications that are relevant to the User's tags.
 
-For example purposes, Commands and Queries can be generated in a web browser by navigating to localhost:8080 and using the provided links.
+For example purposes, Commands and Queries can be generated in a web browser by navigating to [the index](localhost:8080) and using the provided links.
 
 ##Design Considerations/Assumptions
 
@@ -25,11 +25,11 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 ##Major Modifications
 
 * Updated to Akka 2.4.6 and Scala 2.11.8
-* Added `reference.conf` per (the Akka Persistence docs)[http://doc.akka.io/docs/akka/2.4.7/scala/persistence.html#Local_LevelDB_journal]
-* Modified `build.sbt` with fork workaround per (this post)[http://stackoverflow.com/questions/19425613/unsatisfiedlinkerror-with-native-library-under-sbt] (This is a known sbt issue, having to do with native library exportation and the jvm classpath. See (the eventsourced documentation)[https://github.com/eligosource/eventsourced/wiki/Installation#native])
-* Added a Reaper pattern for clean shutdown of web server and unlocking of database per (shutdown patterns in akka)[http://letitcrash.com/post/30165507578/shutdown-patterns-in-akka-2]
-* Utilized the Spray.io routing techniques described in (the spray-routing documentation)[http://spray.io/documentation/1.2.3/spray-routing/#spray-routing]
-* Queries handled with ask pattern per (Alvin Alexander's blog)[http://alvinalexander.com/scala/scala-akka-actors-ask-examples-future-await-timeout-result]
+* Added `reference.conf` per [the Akka Persistence docs](http://doc.akka.io/docs/akka/2.4.7/scala/persistence.html#Local_LevelDB_journal)
+* Modified `build.sbt` with fork workaround per [this post](http://stackoverflow.com/questions/19425613/unsatisfiedlinkerror-with-native-library-under-sbt) (This is a known sbt issue, having to do with native library exportation and the jvm classpath. See [the eventsourced documentation](https://github.com/eligosource/eventsourced/wiki/Installation#native))
+* Added a Reaper pattern for clean shutdown of web server and unlocking of database per [shutdown patterns in akka](http://letitcrash.com/post/30165507578/shutdown-patterns-in-akka-2)
+* Utilized the Spray.io routing techniques described in [the spray-routing documentation](http://spray.io/documentation/1.2.3/spray-routing/#spray-routing)
+* Queries handled with ask pattern per [Alvin Alexander's blog](http://alvinalexander.com/scala/scala-akka-actors-ask-examples-future-await-timeout-result)
 
 ##To get started
 
@@ -41,13 +41,17 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 
         $ cd my-project
 
-3. Launch application:
+3. Some very basic tests can be run preliminarily:
+
+        $ sbt test
+
+4. Launch application:
 
         $ sbt run
 
-6. Browse to [http://localhost:8080](http://localhost:8080/)
+5. Once the message `[info] [INFO] ... Bound to localhost/127.0.0.1:8080` displays in the console, browse to [the index](http://localhost:8080/) and follow directions to test the system and demonstrate its behavior.
 
-7. To stop the application, browse to [the stop page](http://localhost:8080/stop)
+6. To stop the application, browse to [the stop page](http://localhost:8080/stop)
 
 ##Development direction
 
@@ -62,6 +66,5 @@ Tasks remaining for core functionality:
 
 Additional:
 
-* Consider publish-subscribe messaging channel per Vernon, p. 154
 * Add applicative validation with scalaz per https://github.com/bmorris458/market-lib and  https://github.com/ironfish/akka-persistence-mongo-samples
 * Clean up routes (make respond correctly to GETs and PUTs, rather than the sloppy front-end put together for this demo) and add view templates per http://tysonjh.com/blog/2014/05/05/spray-custom-404/

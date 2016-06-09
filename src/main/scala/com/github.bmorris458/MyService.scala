@@ -81,7 +81,7 @@ class MyServiceActor extends Actor with HttpService {
     path("") {
       get {
         respondWithMediaType(`text/html`) {
-          complete(index)
+          getFromFile("src/main/resources/index.html")
         }
       }
     } ~
@@ -210,35 +210,4 @@ class MyServiceActor extends Actor with HttpService {
         }
       }
     }
-
-  lazy val index =
-    """<html>
-      <body>
-        <h1>Welcome to the Market!</h1>
-        <p>Test Links:</p>
-        <ul>
-          <li><a href="/users">Query all users</a></li>
-          <li><a href="/users/add?id=a101&name=Ben">Add user Ben with ID a101</a></li>
-          <li><a href="/users/addtag?id=a101&tag=Black Widow">Add a subscription to Ben</a></li>
-          <li><a href="/users/removetag?id=a101&tag=Black Widow">Remove a subscription from Ben</a></li>
-          <li><a href="/users/add?id=a102&name=Sally">Add user Sally with ID a102</a></li>
-          <li><a href="/users/a101">Query user a101</a></li>
-          <li><a href="/users/a102">Query user a102</a></li>
-          <li><a href="/users/a101/notifications">Check notifications for Ben</a></li>
-          <li><a href="/users/remove?id=a101">Remove user Ben</a></li>
-          <li><a href="/users/remove?id=a102">Remove user Sally</a></li>
-          <br>
-          <li><a href="/items">Query all items</a></li>
-          <li><a href="/items/add?id=q2101&title=Black Widow">Add item Black Widow with ID q2101</a></li>
-          <li><a href="/items/addtag?id=q2101&tag=Black Widow">Add a tag to Black Widow</a></li>
-          <li><a href="/items/add?id=q2102&title=Red Sonja">Add item Red Sonja with ID q2102</a></li>
-          <li><a href="/items/q2101">Query item q2101</a></li>
-          <li><a href="/items/q2102">Query item q2102</a></li>
-          <li><a href="/items/remove?id=q2101">Remove item Black Widow</a></li>
-          <li><a href="/items/remove?id=q2102">Remove item Red Sonja</a></li>
-          <br>
-          <li><a href="/stop?method=post">Stop server</a></li>
-        </ul>
-      </body>
-    </html>"""
 }
