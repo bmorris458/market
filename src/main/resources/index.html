@@ -1,0 +1,58 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+<html>
+  <body>
+   <div id="contentBox" style="margin:0px auto; width:70%">
+    <h1>Welcome to the Market!</h1>
+    <h2>To test the system:</h2>
+    <p>First, feel free to click any of the 'Query' links below, and see that they do not
+    return any values. Then, add one of the users and click the user query links
+    again. See that they return only the expected user. Click to add the other user
+    and then see 'Query all users' return both. Note the empty Set for each user.
+    Click to add a subscription for each user, and then 'Query all users' again to
+    see that the subscriptions have been added.
+    <p>Now, add the items, but do not add any tags yet. Check the subscriptions for
+    user 'Ben'. There should be no notifications, as currently notifications are only
+    checked against tags, and no tags are generated automatically when an item is
+    added. Now, add the tag to 'Black Widow' (the comic Ben has as a subscription).
+    Click 'Check notifications for Ben' and see the notification show up. Check
+    notifications again and see that none are returned, as the notification has
+    already been consumed. Then, remove 'Black Widow', and check the notifications
+    again to see the notification that the item has been sold.
+    <p>Feel free to play with any combination of the links (or check out the URIs
+    to see the pattern for adding and removing things and modify them, then query
+    the system to see the changes--hopefully it's reasonably intuitive).
+    <p>Also, to demonstrate recoverability, use the stop link to shut down the
+    application, then return to the console and `sbt run` the application again.
+    It will replay any actions taken and restore the state of the system prior
+    to shutdown.
+    <p>
+    <h2>Test Links:</h2>
+    <ul>
+      <li><a href="/users">Query all users</a></li>
+      <li><a href="/users/add?id=a101&name=Ben">Add user Ben with ID a101</a></li>
+      <li><a href="/users/addtag?id=a101&tag=Black Widow">Add a subscription to Ben</a></li>
+      <li><a href="/users/removetag?id=a101&tag=Black Widow">Remove a subscription from Ben</a></li>
+      <li><a href="/users/add?id=a102&name=Sally">Add user Sally with ID a102</a></li>
+      <li><a href="/users/a101">Query user a101</a></li>
+      <li><a href="/users/a102">Query user a102</a></li>
+      <li><a href="/users/a101/notifications">Check notifications for Ben</a></li>
+      <li><a href="/users/remove?id=a101">Remove user Ben</a></li>
+      <li><a href="/users/remove?id=a102">Remove user Sally</a></li>
+      <br>
+      <li><a href="/items">Query all items</a></li>
+      <li><a href="/items/add?id=q2101&title=Black Widow">Add item Black Widow with ID q2101</a></li>
+      <li><a href="/items/addtag?id=q2101&tag=Black Widow">Add a tag to Black Widow</a></li>
+      <li><a href="/items/add?id=q2102&title=Red Sonja">Add item Red Sonja with ID q2102</a></li>
+      <li><a href="/items/q2101">Query item q2101</a></li>
+      <li><a href="/items/q2102">Query item q2102</a></li>
+      <li><a href="/items/remove?id=q2101">Remove item Black Widow</a></li>
+      <li><a href="/items/remove?id=q2102">Remove item Red Sonja</a></li>
+      <br>
+      <li><a href="/stop?method=post">Stop server</a></li>
+    </ul>
+    <p>Have fun!
+    <p>
+    <p>&nbsp
+  </body>
+</html>

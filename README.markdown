@@ -41,13 +41,17 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 
         $ cd my-project
 
-3. Launch application:
+3. Some very basic tests can be run preliminarily:
+
+        $ sbt test
+
+4. Launch application:
 
         $ sbt run
 
-6. Browse to [the index](http://localhost:8080/)
+5. Once the message `[info] [INFO] ... Bound to localhost/127.0.0.1:8080` displays in the console, browse to [the index](http://localhost:8080/) and follow directions to test the system and demonstrate its behavior.
 
-7. To stop the application, browse to [the stop page](http://localhost:8080/stop)
+6. To stop the application, browse to [the stop page](http://localhost:8080/stop)
 
 ##Development direction
 
