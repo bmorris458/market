@@ -28,9 +28,6 @@ case object PullNotes
 
 class NotificationPublisher extends Actor {
   implicit val timeout: Timeout = 5.seconds
-  //Publisher has to get the ref for system. I could request an introduction,
-  //but for now I'll just look up /user.
-  //val system = Await.result(context.actorSelection("user/").resolveOne(), timeout.duration)
 
   def receive = {
     case alert: NewItemTagAlert => {
@@ -47,7 +44,7 @@ class NotificationPublisher extends Actor {
 
 class Subscriber extends Actor {
   implicit val timeout: Timeout = 5.seconds
-  //val system = Await.result(context.actorSelection("user/").resolveOne(), timeout.duration)
+
   context.system.eventStream.subscribe(self, classOf[Notification])
   var watchedTags = Set[String]()
   var unreadNotes = List[Notification]()
@@ -56,7 +53,7 @@ class Subscriber extends Actor {
     case WatchTag(tag) => watchedTags = watchedTags + tag
     case UnwatchTag(tag) => watchedTags = watchedTags - tag
     case UnwatchAllTags => watchedTags = Set[String]()
-    case n: SubscriptionNotification => if(watchedTags contains n.tag) unreadNotes = n :: unreadNotes
+    case n: SubscriptionNotification => if(watchedTags contains n.tag && !(unreadNotes contains n)) unreadNotes = n :: unreadNotes
     case n: ItemSoldNotification => unreadNotes = n :: unreadNotes //Right now all users get all ItemSoldNotifications. Could be improved, but works for now.
     case PullNotes => {
       println(s"Pulling notes: $unreadNotes")

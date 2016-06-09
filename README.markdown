@@ -19,7 +19,7 @@ For example purposes, Commands and Queries can be generated in a web browser by 
 ##Design Considerations/Assumptions
 
 * Preliminarily, each user will only have a name, an ID number, and a set of tags that describe subscriptions. Each item for sale will only have a title and a set of tags describing possible subscription criteria (including author, artist, etc.)
-* A User may be an ActiveUser or an InactiveUser, likewise for an Item. This will be the sole means of discerning user or item status.
+* Notifications will only be generated on tags, not titles or any other item fields, so to allow a user to subscribe to a title, each copy of that title would have to also be tagged with the title string (this can be viewed as a feature, making it simpler to subscribe to all variations of a series and sub-series, or to subscribe only to a sub-series, and any extra overhead could be mitigated by making a higher-level routine that batches the process of tagging each item with its own title).
 * User authentication and security will be handled outside of this module. Any function that modifies a user entry in this library (and associated databases) will not check for user permissions, so security should be implemented prior to calling.
 
 ##Major Modifications
