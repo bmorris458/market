@@ -2,6 +2,8 @@ package com.github.bmorris458.market
 
 import org.scalatest.{BeforeAndAfterAll, WordSpecLike, Matchers}
 import com.typesafe.config.ConfigFactory
+import java.io.File
+import org.apache.commons.io.FileUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
@@ -28,10 +30,9 @@ class ActorSpec
 
     override def afterAll {
       shutdown()
-    }
-
-    "A CommandProcessor" should {
-
+      println("Cleaning up journal directories")
+      FileUtils.deleteDirectory(new File("journal"))
+      FileUtils.deleteDirectory(new File("snapshot"))
     }
 
     "An EchoActor" should {
@@ -54,12 +55,32 @@ class ActorSpec
       }
     }
 
-    "A Notify-Subscribe channel" should {
+    "A Publish-Subscribe channel" should {
       "publish correctly formatted notifications to the event stream" in {
-
+        subscriber ! WatchTag("123")
+        expectNoMsg
+        publisher ! NewItemTagAlert("abc", "123")
+        expectNoMsg
+        publisher ! ItemSoldAlert("abc")
+        expectNoMsg
+        subscriber ! PullNotes
+        expectMsg(List(ItemSoldNotification("abc"), SubscriptionNotification("abc","123")))
       }
       "read and store only notifications for subscribed tags" in {
-
+        subscriber ! WatchTag("123")
+        expectNoMsg
+        publisher ! NewItemTagAlert("a", "123")
+        expectNoMsg
+        publisher ! NewItemTagAlert("a", "xyz")
+        expectNoMsg
+        publisher ! NewItemTagAlert("q", "123")
+        expectNoMsg
+        publisher ! NewItemTagAlert("a", "blarg")
+        expectNoMsg
+        publisher ! ItemSoldAlert("q")
+        expectNoMsg
+        subscriber ! PullNotes
+        expectMsg(List(ItemSoldNotification("q"), SubscriptionNotification("q","123"), SubscriptionNotification("a","123")))
       }
     }
   }
