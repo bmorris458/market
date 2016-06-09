@@ -53,7 +53,7 @@ class Subscriber extends Actor {
     case WatchTag(tag) => watchedTags = watchedTags + tag
     case UnwatchTag(tag) => watchedTags = watchedTags - tag
     case UnwatchAllTags => watchedTags = Set[String]()
-    case n: SubscriptionNotification => if(watchedTags contains n.tag) unreadNotes = n :: unreadNotes
+    case n: SubscriptionNotification => if(watchedTags contains n.tag && !(unreadNotes contains n)) unreadNotes = n :: unreadNotes
     case n: ItemSoldNotification => unreadNotes = n :: unreadNotes //Right now all users get all ItemSoldNotifications. Could be improved, but works for now.
     case PullNotes => {
       println(s"Pulling notes: $unreadNotes")
