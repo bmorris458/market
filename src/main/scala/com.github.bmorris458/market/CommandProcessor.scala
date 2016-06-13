@@ -27,11 +27,18 @@ class CommandProcessor extends PersistentActor {
   val queryProcessor = context.actorOf(Props[EchoActor], "MrEko")
   val publisher = context.actorOf(Props[NotificationPublisher], "Gutenburg")
 
+  val cToEMap: Map[Command,Event] = ...
+  def validate(c: Command): Event = {
+    cToEMap(c)
+  }
+  def validateAndForward(cmd: Command) = {
+    persist(validate(cmd))(sendEvent)
+  }
   override def receiveCommand: Receive = {
     case SayHello => sender ! Hello(queryProcessor) //Introduce Guardian to MrEko, so Guardian knows where to send queries
     case "Please introduce yourself" => sender ! Hello(queryProcessor) //Guardian uninitialized, reintroduce MrEko
-    case cmd: AddUser =>
-      persist(UserAdded(cmd.id, cmd.expectedVersion, cmd.name)) { event =>
+    case AddUser(id, ev, name) =>
+      persist(UserAdded(id, ev, name)) { event =>
         sendEvent(event)
       }
     //Tag commands should really include a query and validation to ensure that the target exists.
